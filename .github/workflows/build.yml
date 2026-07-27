@@ -1,0 +1,69 @@
+# Build FilmScriptWriter installers on Linux, Windows, and macOS.
+# Triggered on tags (releases) and manual "Run workflow".
+#
+# BETA: installers are for testing only — not a stable product release.
+
+name: Build installers (beta)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  build:
+    name: Package (${{ matrix.os }})
+    needs: test
+    # Skip packaging on PRs to save minutes; still run tests above
+    if: github.event_name != 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cmd: dist:linux
+          - os: windows-latest
+            cmd: dist:win
+          - os: macos-latest
+            cmd: dist:mac
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build installers
+        run: npm run ${{ matrix.cmd }}
+        env:
+          # Unsigned builds are fine for beta distribution
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FilmScriptWriter-beta-${{ matrix.os }}
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.exe
+            release/*.dmg
+            release/*.yml
+          if-no-files-found: warn
+          retention-days: 14
