@@ -1,0 +1,100 @@
+Title: FilmScriptWriter Starter Template
+Credit: Written by
+Author: Your Name
+Source: Based on original idea
+Draft date: 2026-01-01
+Contact:
+  your.email@example.com
+
+# Getting started
+
+= This file is a *template*. When you save your work, use Save As so this original stays available.
+
+[[Notes like this are Fountain comments and do not appear in the PDF.]]
+
+/* Boneyard / draft scratch — also omitted from export
+   Use this for lines you are not ready to cut completely. */
+
+INT. WRITER'S ROOM - DAY
+
+A corkboard full of index cards. Soft laptop GLOW. Coffee steam rises.
+
+THE WRITER sits, fingers hovering over the keys.
+
+WRITER
+(to self)
+Start with a scene heading. Then action. Then people talking.
+
+They type. The screen fills with words.
+
+CUT TO:
+
+EXT. CITY STREET - CONTINUOUS
+
+Rain-slick asphalt. Neon reflections. Foot traffic moves past.
+
+.A FORCED SCENE HEADING
+(Scene headings can also be forced with a leading period.)
+
+ACTION lines are normal paragraphs. They describe what we *see* and *hear*.
+
+You can emphasise with *italics*, **bold**, or ***both*** in Fountain.
+
+CHARACTER CUES are UPPERCASE on their own line after a blank line.
+
+ALICE
+Hello. This is dialogue.
+
+BOB (V.O.)
+(wry)
+And this is a parenthetical under a character with a voice-over extension.
+
+ALICE
+We can go back and forth.
+
+BOB
+For as long as the scene needs.
+
+>SMASH CUT TO:
+
+INT. COFFEE SHOP - NIGHT
+
+Same city, later. Warmer light. Soft MUSIC under.
+
+# Dual dialogue example
+
+= Place a caret ^ after the second character name for dual dialogue in full Fountain tools.
+
+ALICE
+I thought you'd never ask.
+
+BOB ^
+I was waiting for the right moment.
+
+# Transitions and centred text
+
+FADE TO:
+
+>THE END<
+
+# Markdown-style extras Fountain understands
+
+## Sections use hash marks
+### Nested outline levels help you organise
+
+= Synopses start with an equals sign (single, not a page break).
+
+Page breaks look like this:
+
+===
+
+INT. EPILOGUE - DAY
+
+One last beat. Keep writing. Save often.
+
+WRITER
+(smiling)
+And when you're done... Save As under a new name.
+The starter template will still be here next time.
+
+FADE OUT.

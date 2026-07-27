@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FilmScriptWriter (Beta)</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-toolbar" role="banner">
+        <span class="doc-title" id="doc-title">Untitled</span>
+        <span class="spacer"></span>
+        <div class="toolbar-group" id="toolbar-font" title="Font size">
+          <button type="button" id="btn-font-dec" aria-label="Decrease font">A−</button>
+          <span class="font-size-label" id="font-size-label">14</span>
+          <button type="button" id="btn-font-inc" aria-label="Increase font">A+</button>
+        </div>
+        <button type="button" id="btn-find" title="Find">Find</button>
+        <button type="button" id="btn-replace" title="Find and Replace">Replace</button>
+        <button type="button" id="btn-toggle-preview" title="Toggle preview">Preview</button>
+        <button type="button" id="btn-theme" title="Toggle theme">Theme</button>
+      </header>
+
+      <main class="workspace" id="workspace">
+        <section class="editor-pane" aria-label="Editor">
+          <div id="editor"></div>
+        </section>
+        <div class="pane-resizer" id="pane-resizer" role="separator" aria-orientation="vertical"></div>
+        <aside class="preview-pane" id="preview-pane" aria-label="Preview"></aside>
+
+        <div class="welcome-overlay" id="welcome-overlay">
+          <div class="welcome-card">
+            <h1 id="welcome-title">Welcome</h1>
+            <p id="welcome-body">Create a new screenplay or open an existing file.</p>
+            <div class="welcome-actions">
+              <button type="button" class="primary" id="welcome-new">New</button>
+              <button type="button" id="welcome-open">Open…</button>
+              <button type="button" id="welcome-dismiss">Close</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="status-bar" role="contentinfo">
+        <span class="status-item" id="status-words"><strong>0</strong> Words</span>
+        <span class="status-item" id="status-pages"><strong>1</strong> Pages</span>
+        <span class="status-item" id="status-state">Ready</span>
+        <span class="status-divider" aria-hidden="true">|</span>
+        <div class="status-group">
+          <button type="button" class="status-btn" id="status-font-dec" title="Decrease font">A−</button>
+          <span class="status-item" id="status-font"><span id="status-font-label">Font</span> <strong id="status-font-value">14</strong></span>
+          <button type="button" class="status-btn" id="status-font-inc" title="Increase font">A+</button>
+        </div>
+        <span class="status-divider" aria-hidden="true">|</span>
+        <button type="button" class="status-btn" id="status-find">Find</button>
+        <button type="button" class="status-btn" id="status-replace">Replace</button>
+        <span class="status-spacer"></span>
+        <span class="status-path" id="status-path"></span>
+      </footer>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

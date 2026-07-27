@@ -1,0 +1,149 @@
+{
+  "name": "filmscriptwriter",
+  "version": "1.0.0-beta.1",
+  "description": "FilmScriptWriter (BETA) — Fountain screenplay editor for desktop. Early preview.",
+  "main": "./out/main/index.js",
+  "author": {
+    "name": "Graham Inman",
+    "email": "support@grokcode.example"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/grahaminman/FilmScriptWriter-app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grahaminman/FilmScriptWriter-app.git"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.node.json",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "dist:all": "npm run build && electron-builder -mwl",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/commands": "^6.8.0",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/search": "^6.5.10",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.36.5",
+    "@lezer/highlight": "^1.2.1",
+    "electron-store": "^8.2.0",
+    "electron-updater": "^6.3.9",
+    "pdfkit": "^0.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/pdfkit": "^0.13.9",
+    "electron": "^34.3.0",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^3.0.0",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2",
+    "vitest": "^3.0.9"
+  },
+  "build": {
+    "appId": "com.filmscriptwriter.app",
+    "productName": "FilmScriptWriter",
+    "copyright": "Copyright © 2026 FilmScriptWriter",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "icon": "build/icon.png",
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources",
+        "filter": ["**/*"]
+      }
+    ],
+    "asar": true,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "grahaminman",
+        "repo": "FilmScriptWriter-app"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "FilmScriptWriter"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "category": "Office",
+      "maintainer": "GrokCodeTest <support@grokcode.example>",
+      "artifactName": "${productName}-${version}.${ext}",
+      "desktop": {
+        "Name": "FilmScriptWriter",
+        "Comment": "FilmScriptWriter — professional Fountain screenplay editor",
+        "Categories": "Office;TextEditor;"
+      }
+    },
+    "appImage": {
+      "license": "LICENSE"
+    }
+  }
+}
