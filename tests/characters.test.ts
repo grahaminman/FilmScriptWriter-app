@@ -76,7 +76,9 @@ describe('Character name memory', () => {
 
   it('enforces character uppercase preserving dual and force markers', () => {
     expect(enforceCharacterUppercase('alice')).toBe('ALICE')
-    expect(enforceCharacterUppercase('@bob (v.o.)')).toBe('@BOB (V.O.)')
+    // Forced @ keeps mixed case (fountain.io)
+    expect(enforceCharacterUppercase('@bob (v.o.)')).toBe('@bob (v.o.)')
+    expect(enforceCharacterUppercase('@McClane')).toBe('@McClane')
     expect(enforceCharacterUppercase('carol ^')).toBe('CAROL ^')
   })
 

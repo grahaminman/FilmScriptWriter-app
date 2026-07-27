@@ -15,6 +15,11 @@ import {
   type LocaleCode,
   type ThemeMode
 } from '../shared/constants/screenplay'
+import {
+  SYNTAX_PRESET_DEFAULT,
+  type SyntaxColorPalette,
+  type SyntaxColorPresetId
+} from '../shared/constants/syntax-colors'
 
 export interface AppPreferences {
   theme: ThemeMode
@@ -33,6 +38,10 @@ export interface AppPreferences {
   typewriterMode: boolean
   /** Colour Fountain syntax in the editor. */
   syntaxHighlighting: boolean
+  /** Preset id, or "custom" when using syntaxColorsCustom. */
+  syntaxColorPreset: SyntaxColorPresetId
+  /** User-defined palette when preset is "custom". */
+  syntaxColorsCustom: SyntaxColorPalette
   /** Editor body font size in CSS pixels. */
   editorFontSize: number
   windowBounds: {
@@ -52,6 +61,8 @@ const defaults: AppPreferences = {
   previewFollow: true,
   typewriterMode: false,
   syntaxHighlighting: true,
+  syntaxColorPreset: 'default',
+  syntaxColorsCustom: { ...SYNTAX_PRESET_DEFAULT },
   editorFontSize: FONT_SIZE_DEFAULT,
   windowBounds: {
     width: 1400,
@@ -86,6 +97,14 @@ export function getPreferences(): AppPreferences {
       'syntaxHighlighting',
       defaults.syntaxHighlighting
     ),
+    syntaxColorPreset: prefsStore.get(
+      'syntaxColorPreset',
+      defaults.syntaxColorPreset
+    ),
+    syntaxColorsCustom: {
+      ...SYNTAX_PRESET_DEFAULT,
+      ...prefsStore.get('syntaxColorsCustom', defaults.syntaxColorsCustom)
+    },
     editorFontSize: clampFontSize(
       prefsStore.get('editorFontSize', defaults.editorFontSize)
     ),

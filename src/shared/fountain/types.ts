@@ -20,6 +20,8 @@ export type ElementType =
   | 'title_page_key'
   | 'empty'
   | 'lyrics'
+  /** Layout-only: two dialogue columns side by side (fountain.io dual dialogue). */
+  | 'dual_dialogue'
 
 /** A single parsed screenplay element. */
 export interface FountainElement {
@@ -82,6 +84,18 @@ export interface LayoutLine {
   sourceLine?: number
   /** Whether this is a forced blank spacer after a block. */
   isSpacer?: boolean
+  /**
+   * Dual-dialogue column (from fountain.io `^` on the second character).
+   * When set, preview/PDF place left and right columns side by side.
+   */
+  dualColumn?: 'left' | 'right'
+  /**
+   * For dual dialogue, sibling lines in the other column share a dualGroup id
+   * so the renderer can wrap a row.
+   */
+  dualGroup?: number
+  /** Forced character (`@`) — mixed case preserved in print. */
+  forced?: boolean
 }
 
 /** One paginated screenplay page. */

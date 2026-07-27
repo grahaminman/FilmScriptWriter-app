@@ -1,9 +1,8 @@
 /**
  * Live paginated screenplay preview.
  *
- * Uses the same pagination algorithm and margin constants as PDF export
- * so what you see matches the printed page — including blank lines.
- * Supports scrolling to a source line when "preview follows editor" is on.
+ * Uses the same pagination algorithm and margin constants as PDF export.
+ * Renders fountain.io emphasis, dual dialogue columns, and forced @ names.
  */
 
 import {
@@ -16,24 +15,29 @@ import {
   PAGE_WIDTH_IN,
   PARENTHETICAL_LEFT_IN
 } from '../../shared/constants/screenplay'
+import { emphasisToHtml } from '../../shared/fountain/emphasis'
 import { paginateSource } from '../../shared/fountain/page-counter'
 import type { LayoutLine, ScreenplayPage } from '../../shared/fountain/types'
 import { t } from '../../shared/i18n/locales'
 import type { LocaleCode } from '../../shared/constants/screenplay'
 
-/** CSS inches helper for inline styles. */
 function inch(n: number): string {
   return `${n}in`
 }
 
-/** One screenplay line in CSS (matches PDF LINE_HEIGHT_PT). */
 function lineHeightCss(): string {
   return `${LINE_HEIGHT_PT}pt`
 }
 
 function lineClass(line: LayoutLine): string {
   if (line.isSpacer || line.type === 'empty') return 'sp-line sp-spacer'
-  return `sp-line sp-${line.type}`
+  const dual =
+    line.dualColumn === 'left'
+      ? ' sp-dual-left'
+      : line.dualColumn === 'right'
+        ? ' sp-dual-right'
+        : ''
+  return `sp-line sp-${line.type}${dual}`
 }
 
 function lineStyle(line: LayoutLine): string {
@@ -41,16 +45,24 @@ function lineStyle(line: LayoutLine): string {
     const h = lineHeightCss()
     return `height:${h};min-height:${h};line-height:${h};`
   }
+  // Dual columns use flex layout — no classic left margins
+  if (line.dualColumn) {
+    if (line.type === 'character') return 'font-weight:700; text-align:center;'
+    if (line.type === 'parenthetical') return 'font-style:italic; text-align:center;'
+    if (line.type === 'lyrics') return 'font-style:italic;'
+    return ''
+  }
   switch (line.type) {
     case 'character':
-      return `margin-left:${inch(CHARACTER_LEFT_IN - MARGIN_LEFT_IN)};`
+      return `margin-left:${inch(CHARACTER_LEFT_IN - MARGIN_LEFT_IN)}; font-weight:700;`
     case 'parenthetical':
-      return `margin-left:${inch(PARENTHETICAL_LEFT_IN - MARGIN_LEFT_IN)}; max-width:${inch(PAGE_WIDTH_IN - PARENTHETICAL_LEFT_IN - 2)};`
+      return `margin-left:${inch(PARENTHETICAL_LEFT_IN - MARGIN_LEFT_IN)}; max-width:${inch(PAGE_WIDTH_IN - PARENTHETICAL_LEFT_IN - 2)}; font-style:italic;`
     case 'dialogue':
-    case 'lyrics':
       return `margin-left:${inch(DIALOGUE_LEFT_IN - MARGIN_LEFT_IN)}; max-width:${inch(PAGE_WIDTH_IN - DIALOGUE_LEFT_IN - 1.5)};`
+    case 'lyrics':
+      return `margin-left:${inch(DIALOGUE_LEFT_IN - MARGIN_LEFT_IN)}; max-width:${inch(PAGE_WIDTH_IN - DIALOGUE_LEFT_IN - 1.5)}; font-style:italic;`
     case 'transition':
-      return 'text-align:right;'
+      return 'text-align:right; text-transform:uppercase;'
     case 'centered':
       return 'text-align:center;'
     case 'scene_heading':
@@ -60,31 +72,18 @@ function lineStyle(line: LayoutLine): string {
   }
 }
 
-function renderPage(page: ScreenplayPage): string {
-  const lines = page.lines
-    .map((line) => {
-      if (line.type === 'page_break') return ''
-
-      const srcAttr =
-        line.sourceLine !== undefined
-          ? ` data-source-line="${line.sourceLine}"`
-          : ''
-
-      if (line.isSpacer || line.type === 'empty') {
-        return `<div class="${lineClass(line)}" style="${lineStyle(line)}"${srcAttr} aria-hidden="true">&nbsp;</div>`
-      }
-
-      const text = escapeHtml(line.text).replace(/\n/g, '<br>')
-      return `<div class="${lineClass(line)}" style="${lineStyle(line)}"${srcAttr}>${text || '&nbsp;'}</div>`
-    })
-    .join('')
-
-  return `
-    <article class="sp-page" data-page="${page.pageNumber}" aria-label="Page ${page.pageNumber}">
-      <div class="sp-page-number">${page.pageNumber}.</div>
-      <div class="sp-page-body">${lines}</div>
-    </article>
-  `
+/** Format element text: emphasis → HTML; character forced case already in text. */
+function formatLineHtml(line: LayoutLine): string {
+  if (line.isSpacer || line.type === 'empty') return '&nbsp;'
+  // Scene headings: uppercase display except we already uppercased non-forced
+  if (line.type === 'scene_heading') {
+    return emphasisToHtml(line.text)
+  }
+  if (line.type === 'character') {
+    // Forced @ names keep mixed case; others are already upper in parser
+    return escapeHtml(line.text)
+  }
+  return emphasisToHtml(line.text) || '&nbsp;'
 }
 
 function escapeHtml(s: string): string {
@@ -95,19 +94,121 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;')
 }
 
+/**
+ * Render page lines, grouping dual-dialogue pairs into two-column rows.
+ */
+function renderPage(page: ScreenplayPage): string {
+  const lines = page.lines
+  const parts: string[] = []
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i]
+    if (line.type === 'page_break') {
+      i += 1
+      continue
+    }
+
+    // Start of a dual group (prefer left column first)
+    if (line.dualGroup != null && line.dualColumn === 'left') {
+      const group = line.dualGroup
+      const left: LayoutLine[] = []
+      const right: LayoutLine[] = []
+      // Collect left column
+      while (
+        i < lines.length &&
+        lines[i].dualGroup === group &&
+        lines[i].dualColumn === 'left'
+      ) {
+        left.push(lines[i])
+        i += 1
+      }
+      // Skip spacers between the two dialogue blocks
+      while (
+        i < lines.length &&
+        (lines[i].isSpacer || lines[i].type === 'empty')
+      ) {
+        i += 1
+      }
+      // Collect right column
+      while (
+        i < lines.length &&
+        lines[i].dualGroup === group &&
+        lines[i].dualColumn === 'right'
+      ) {
+        right.push(lines[i])
+        i += 1
+      }
+      parts.push(renderDualRow(left, right))
+      continue
+    }
+
+    // Orphan right column (shouldn't happen often)
+    if (line.dualGroup != null && line.dualColumn === 'right') {
+      const group = line.dualGroup
+      const right: LayoutLine[] = []
+      while (i < lines.length && lines[i].dualGroup === group) {
+        if (lines[i].dualColumn === 'right') right.push(lines[i])
+        i += 1
+      }
+      parts.push(renderDualRow([], right))
+      continue
+    }
+
+    const srcAttr =
+      line.sourceLine !== undefined
+        ? ` data-source-line="${line.sourceLine}"`
+        : ''
+
+    if (line.isSpacer || line.type === 'empty') {
+      parts.push(
+        `<div class="${lineClass(line)}" style="${lineStyle(line)}"${srcAttr} aria-hidden="true">&nbsp;</div>`
+      )
+    } else {
+      parts.push(
+        `<div class="${lineClass(line)}" style="${lineStyle(line)}"${srcAttr}>${formatLineHtml(line)}</div>`
+      )
+    }
+    i += 1
+  }
+
+  return `
+    <article class="sp-page" data-page="${page.pageNumber}" aria-label="Page ${page.pageNumber}">
+      <div class="sp-page-number">${page.pageNumber}.</div>
+      <div class="sp-page-body">${parts.join('')}</div>
+    </article>
+  `
+}
+
+function renderDualRow(left: LayoutLine[], right: LayoutLine[]): string {
+  const col = (lines: LayoutLine[]): string =>
+    lines
+      .filter((l) => !l.isSpacer && l.type !== 'empty')
+      .map((l) => {
+        const srcAttr =
+          l.sourceLine !== undefined
+            ? ` data-source-line="${l.sourceLine}"`
+            : ''
+        return `<div class="${lineClass(l)}" style="${lineStyle(l)}"${srcAttr}>${formatLineHtml(l)}</div>`
+      })
+      .join('')
+
+  const src =
+    left[0]?.sourceLine ?? right[0]?.sourceLine
+  const srcAttr = src !== undefined ? ` data-source-line="${src}"` : ''
+
+  return `<div class="sp-dual"${srcAttr}><div class="sp-dual-col">${col(left)}</div><div class="sp-dual-col">${col(right)}</div></div>`
+}
+
 export interface PreviewHandle {
   render: (source: string) => void
   setLocale: (locale: LocaleCode) => void
-  /** Scroll preview so the block for source line (1-based editor line) is visible. */
   scrollToSourceLine: (editorLine1Based: number) => void
   setZoom: (scale: number) => void
   getPageCount: () => number
   getWordCount: () => number
 }
 
-/**
- * Mount the live preview into a container element.
- */
 export function createPreview(container: HTMLElement, locale: LocaleCode): PreviewHandle {
   let currentLocale = locale
   let pageCount = 1
@@ -151,12 +252,10 @@ export function createPreview(container: HTMLElement, locale: LocaleCode): Previ
   }
 
   const scrollToSourceLine = (editorLine1Based: number): void => {
-    // Layout stores 0-based source lines
     const zero = Math.max(0, editorLine1Based - 1)
     let target = scroll.querySelector<HTMLElement>(
       `[data-source-line="${zero}"]`
     )
-    // Walk backwards if this exact line is a blank that wasn't tagged tightly
     if (!target) {
       for (let i = zero; i >= 0 && i > zero - 30; i--) {
         target = scroll.querySelector<HTMLElement>(`[data-source-line="${i}"]`)
@@ -165,16 +264,13 @@ export function createPreview(container: HTMLElement, locale: LocaleCode): Previ
     }
     if (!target) return
 
-    // Highlight briefly
     scroll
-      .querySelectorAll('.sp-line.sp-follow-active')
+      .querySelectorAll('.sp-line.sp-follow-active, .sp-dual.sp-follow-active')
       .forEach((n) => n.classList.remove('sp-follow-active'))
     target.classList.add('sp-follow-active')
-
     target.scrollIntoView({ block: 'center', behavior: 'smooth' })
   }
 
-  // Initial empty state
   render('')
 
   return {
@@ -193,7 +289,6 @@ export function createPreview(container: HTMLElement, locale: LocaleCode): Previ
   }
 }
 
-// Expose page dimensions as CSS custom properties for the stylesheet
 export function applyPageCssVars(root: HTMLElement = document.documentElement): void {
   root.style.setProperty('--sp-page-width', inch(PAGE_WIDTH_IN))
   root.style.setProperty('--sp-page-height', inch(PAGE_HEIGHT_IN))

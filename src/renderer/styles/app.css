@@ -24,6 +24,20 @@
   --page-text: #111111;
   --page-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
   --splitter: #2a3142;
+  /* Syntax defaults (overridden by applySyntaxPalette) — strong distinct hues */
+  --syn-scene: #4dabf7;
+  --syn-action: #ced4da;
+  --syn-character: #ff6b6b;
+  --syn-parenthetical: #da77f2;
+  --syn-dialogue: #74c0fc;
+  --syn-transition: #ffa94d;
+  --syn-lyrics: #63e6be;
+  --syn-centered: #b197fc;
+  --syn-section: #adb5bd;
+  --syn-note: #868e96;
+  --syn-boneyard: #868e96;
+  --syn-meta: #38d9a9;
+  --syn-pagebreak: #ff8787;
   color-scheme: dark;
 }
 
@@ -289,17 +303,60 @@ body {
   text-transform: uppercase;
 }
 
+/* Unforced character cues are already uppercased by the parser.
+   Forced @names keep mixed case — do not force uppercase in CSS. */
 .sp-character {
-  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .sp-parenthetical {
   font-style: italic;
 }
 
+.sp-lyrics {
+  font-style: italic;
+}
+
 .sp-transition {
   text-align: right;
   text-transform: uppercase;
+}
+
+/* Dual dialogue (fountain.io caret ^) — two columns */
+.sp-dual {
+  display: flex;
+  flex-direction: row;
+  gap: 0.35in;
+  width: 100%;
+  margin: 0.1in 0 0.15in 0;
+  box-sizing: border-box;
+}
+
+.sp-dual-col {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+
+.sp-dual-col .sp-line {
+  margin-left: 0 !important;
+  max-width: none !important;
+}
+
+.sp-dual.sp-follow-active {
+  outline: 1px solid rgba(76, 139, 245, 0.55);
+  background: rgba(76, 139, 245, 0.08);
+  border-radius: 2px;
+}
+
+/* Emphasis inside action / dialogue */
+.sp-line strong {
+  font-weight: 700;
+}
+.sp-line em {
+  font-style: italic;
+}
+.sp-line u {
+  text-decoration: underline;
 }
 
 /* Responsive base fit for narrow preview panes (zoom multiplies on top) */
@@ -469,4 +526,130 @@ body {
 .preview-pane.hidden + .pane-resizer,
 .workspace.preview-hidden .pane-resizer {
   display: none;
+}
+
+/* ---- Syntax colour settings panel ---- */
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.settings-backdrop.hidden {
+  display: none;
+}
+
+.settings-panel {
+  width: min(440px, 94vw);
+  max-height: min(80vh, 640px);
+  overflow: auto;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.settings-close {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.settings-body {
+  padding: 14px 16px 18px;
+}
+
+.settings-hint {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.settings-row select {
+  min-width: 140px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.settings-colors {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.settings-color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.settings-color-row input[type='color'] {
+  width: 42px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-2);
+  cursor: pointer;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings-actions button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.settings-actions button:hover {
+  border-color: var(--accent);
+  background: var(--accent-muted);
 }

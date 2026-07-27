@@ -191,8 +191,11 @@ export function enforceCharacterUppercase(line: string): string {
     namePart = body
   }
 
-  const upper = namePart.toUpperCase() + extPart.toUpperCase()
-  return leadingWs + (force ? '@' : '') + upper + (dual ? ' ^' : '')
+  // fountain.io: forced @ names keep mixed case (e.g. @McCLANE / @McClane)
+  const finalName = force
+    ? namePart + extPart
+    : namePart.toUpperCase() + extPart.toUpperCase()
+  return leadingWs + (force ? '@' : '') + finalName + (dual ? ' ^' : '')
 }
 
 /**

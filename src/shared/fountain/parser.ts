@@ -413,13 +413,16 @@ export function parseFountain(source: string): FountainDocument {
     // Character cue (must follow a blank line)
     if (previousWasBlank && isCharacterCue(trimmed)) {
       const dual = /\^\s*$/.test(trimmed)
-      const name = stripForcePrefix('character', trimmed).toUpperCase()
+      const forced = trimmed.startsWith('@')
+      // fountain.io: @ keeps mixed case; unforced cues are conventionally uppercase
+      const stripped = stripForcePrefix('character', trimmed)
+      const name = forced ? stripped : stripped.toUpperCase()
       elements.push({
         type: 'character',
         text: name,
         lineIndex: i,
         dual,
-        forced: trimmed.startsWith('@')
+        forced
       })
       inDialogueBlock = true
       previousWasBlank = false
@@ -453,9 +456,16 @@ export function bodyTextForWordCount(doc: FountainDocument): string {
     'page_break',
     'title_page_key'
   ])
+  // Lazy import avoided — strip markers inline for word count
+  const stripMarkers = (s: string): string =>
+    s
+      .replace(/\[\[([\s\S]*?)\]\]/g, '')
+      .replace(/\\([*_])/g, '$1')
+      .replace(/\*{1,3}/g, '')
+      .replace(/_/g, '')
   return doc.elements
     .filter((e) => !skip.has(e.type))
-    .map((e) => e.text)
+    .map((e) => stripMarkers(e.text))
     .join(' ')
 }
 

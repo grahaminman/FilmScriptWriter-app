@@ -37,6 +37,7 @@ export type MenuAction =
   | 'view:preview-follow'
   | 'view:typewriter'
   | 'view:syntax'
+  | 'view:syntax-colors'
   | 'view:font-increase'
   | 'view:font-decrease'
   | 'view:font-reset'
@@ -216,6 +217,10 @@ export function buildApplicationMenu(
           send(win, 'view:syntax')
         }
       },
+      {
+        label: tr('menu.view.syntaxColors'),
+        click: () => send(win, 'view:syntax-colors')
+      },
       { type: 'separator' },
       {
         label: tr('menu.view.fontIncrease'),
@@ -298,6 +303,10 @@ export function buildApplicationMenu(
           buildApplicationMenu(win, currentMenuState)
           send(win, 'view:syntax')
         }
+      },
+      {
+        label: tr('menu.view.syntaxColors'),
+        click: () => send(win, 'view:syntax-colors')
       }
     ]
   }

@@ -22,12 +22,13 @@ import {
   indentWithTab
 } from '@codemirror/commands'
 import {
-  search,
   searchKeymap,
   openSearchPanel,
   highlightSelectionMatches
 } from '@codemirror/search'
-import { fountain, fountainHighlightStyle } from './fountain-language'
+import { fountain } from './fountain-language'
+import { fountainLineHighlighter } from './fountain-line-highlighter'
+import { smartSearch } from './smart-search'
 import { t, type MessageKey } from '../../shared/i18n/locales'
 import {
   FONT_SIZE_DEFAULT,
@@ -50,6 +51,8 @@ export interface EditorHandle {
   onCursorLineChange: (cb: (line: number) => void) => () => void
   destroy: () => void
 }
+
+// highlightComp reuses compartment for line highlighter on/off
 
 export interface CreateEditorOptions {
   parent: HTMLElement
@@ -94,7 +97,7 @@ export function createEditor(options: CreateEditorOptions): EditorHandle {
       highlightActiveLine(),
       history(),
       fountain(),
-      search({ top: true }),
+      smartSearch(),
       highlightSelectionMatches(),
       keymap.of([
         ...defaultKeymap,
@@ -105,7 +108,8 @@ export function createEditor(options: CreateEditorOptions): EditorHandle {
       EditorView.lineWrapping,
       themeComp.of([]),
       fontComp.of(fontSizeTheme(fontSize)),
-      highlightComp.of(syntaxOn ? fountainHighlightStyle(dark) : []),
+      // Line decorations + CSS vars — reliable per-element colours
+      highlightComp.of(syntaxOn ? fountainLineHighlighter() : []),
       typewriterComp.of(typewriterOn ? typewriterExtension() : []),
       placeholderComp.of(
         placeholder(t(locale, 'editor.placeholder' as MessageKey))
@@ -144,11 +148,7 @@ export function createEditor(options: CreateEditorOptions): EditorHandle {
     setTheme: (isDark: boolean) => {
       dark = isDark
       options.parent.dataset.editorTheme = isDark ? 'dark' : 'light'
-      if (syntaxOn) {
-        view.dispatch({
-          effects: highlightComp.reconfigure(fountainHighlightStyle(isDark))
-        })
-      }
+      // Palette is CSS-variable based (shared light/dark); no reconfigure needed
     },
     setLocale: (next: LocaleCode) => {
       locale = next
@@ -168,7 +168,7 @@ export function createEditor(options: CreateEditorOptions): EditorHandle {
       syntaxOn = enabled
       view.dispatch({
         effects: highlightComp.reconfigure(
-          enabled ? fountainHighlightStyle(dark) : []
+          enabled ? fountainLineHighlighter() : []
         )
       })
     },
@@ -232,7 +232,8 @@ function baseEditorChrome(): Extension {
     },
     '.cm-content': {
       padding: '16px 8px 48px 8px',
-      caretColor: 'var(--cm-caret)'
+      caretColor: 'var(--cm-caret)',
+      color: 'var(--text)'
     },
     '.cm-gutters': {
       backgroundColor: 'var(--cm-gutter-bg)',

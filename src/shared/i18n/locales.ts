@@ -35,6 +35,7 @@ export type MessageKey =
   | 'menu.view.previewFollow'
   | 'menu.view.typewriter'
   | 'menu.view.syntax'
+  | 'menu.view.syntaxColors'
   | 'menu.view.fontIncrease'
   | 'menu.view.fontDecrease'
   | 'menu.view.fontReset'
@@ -80,6 +81,10 @@ export type MessageKey =
   | 'update.available'
   | 'update.none'
   | 'update.error'
+  | 'settings.syntaxColors'
+  | 'settings.syntaxHint'
+  | 'settings.preset'
+  | 'settings.resetColors'
 
 export type Messages = Record<MessageKey, string>
 
@@ -111,6 +116,7 @@ const en_GB: Messages = {
   'menu.view.previewFollow': 'Preview Follows Editor',
   'menu.view.typewriter': 'Typewriter Mode',
   'menu.view.syntax': 'Syntax Highlighting',
+  'menu.view.syntaxColors': 'Syntax Colours…',
   'menu.view.fontIncrease': 'Increase Font Size',
   'menu.view.fontDecrease': 'Decrease Font Size',
   'menu.view.fontReset': 'Reset Font Size',
@@ -159,7 +165,12 @@ const en_GB: Messages = {
   'update.checking': 'Checking for updates…',
   'update.available': 'An update is available.',
   'update.none': 'You are on the latest version.',
-  'update.error': 'Could not check for updates.'
+  'update.error': 'Could not check for updates.',
+  'settings.syntaxColors': 'Syntax colours',
+  'settings.syntaxHint':
+    'Colours apply to the editor only. Preview stays black-and-white for print fidelity.',
+  'settings.preset': 'Preset',
+  'settings.resetColors': 'Reset to default'
 }
 
 const es_PY: Messages = {
@@ -190,6 +201,7 @@ const es_PY: Messages = {
   'menu.view.previewFollow': 'Vista previa sigue al editor',
   'menu.view.typewriter': 'Modo máquina de escribir',
   'menu.view.syntax': 'Resaltado de sintaxis',
+  'menu.view.syntaxColors': 'Colores de sintaxis…',
   'menu.view.fontIncrease': 'Aumentar tamaño de fuente',
   'menu.view.fontDecrease': 'Reducir tamaño de fuente',
   'menu.view.fontReset': 'Restablecer tamaño de fuente',
@@ -238,7 +250,12 @@ const es_PY: Messages = {
   'update.checking': 'Buscando actualizaciones…',
   'update.available': 'Hay una actualización disponible.',
   'update.none': 'Ya tiene la última versión.',
-  'update.error': 'No se pudieron buscar actualizaciones.'
+  'update.error': 'No se pudieron buscar actualizaciones.',
+  'settings.syntaxColors': 'Colores de sintaxis',
+  'settings.syntaxHint':
+    'Los colores solo se aplican al editor. La vista previa permanece en blanco y negro.',
+  'settings.preset': 'Preajuste',
+  'settings.resetColors': 'Restablecer valores'
 }
 
 const fr_FR: Messages = {
@@ -269,6 +286,7 @@ const fr_FR: Messages = {
   'menu.view.previewFollow': 'L’aperçu suit l’éditeur',
   'menu.view.typewriter': 'Mode machine à écrire',
   'menu.view.syntax': 'Coloration syntaxique',
+  'menu.view.syntaxColors': 'Couleurs de syntaxe…',
   'menu.view.fontIncrease': 'Augmenter la taille de police',
   'menu.view.fontDecrease': 'Diminuer la taille de police',
   'menu.view.fontReset': 'Réinitialiser la taille de police',
@@ -317,7 +335,12 @@ const fr_FR: Messages = {
   'update.checking': 'Recherche de mises à jour…',
   'update.available': 'Une mise à jour est disponible.',
   'update.none': 'Vous utilisez la dernière version.',
-  'update.error': 'Impossible de rechercher les mises à jour.'
+  'update.error': 'Impossible de rechercher les mises à jour.',
+  'settings.syntaxColors': 'Couleurs de syntaxe',
+  'settings.syntaxHint':
+    'Les couleurs s’appliquent uniquement à l’éditeur. L’aperçu reste en noir et blanc.',
+  'settings.preset': 'Préréglage',
+  'settings.resetColors': 'Réinitialiser'
 }
 
 export const LOCALES: Record<LocaleCode, Messages> = {

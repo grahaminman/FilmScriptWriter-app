@@ -19,6 +19,8 @@ export interface AppPreferences {
   previewFollow: boolean
   typewriterMode: boolean
   syntaxHighlighting: boolean
+  syntaxColorPreset: 'default' | 'highContrast' | 'soft' | 'custom'
+  syntaxColorsCustom: Record<string, string>
   editorFontSize: number
   windowBounds: { width: number; height: number; x?: number; y?: number }
 }

@@ -27,6 +27,7 @@ import {
   countWords,
   parseFountain
 } from './parser'
+import { emphasisToPlain, preparePrintText } from './emphasis'
 import type {
   FountainDocument,
   FountainElement,
@@ -251,18 +252,113 @@ export function elementsToLayoutLines(elements: FountainElement[]): LayoutLine[]
     }
 
     const cpl = charsPerLineFor(el.type)
-    const lineCount = estimateWrappedLines(el.text, cpl)
+    // Print text: strip [[notes]]; keep *emphasis* markers for the renderer
+    const printText = preparePrintText(el.text)
+    const plainForWrap = emphasisToPlain(printText)
+    const lineCount = estimateWrappedLines(plainForWrap, cpl)
     out.push({
       type: el.type,
-      text: el.text,
+      text: printText,
       lineCount,
       elementIndex: i,
-      sourceLine: el.lineIndex
+      sourceLine: el.lineIndex,
+      forced: el.forced
     })
     prevPrintType = el.type
   }
 
+  // Pair dual-dialogue blocks (second character ends with ^ per fountain.io)
+  assignDualDialogueColumns(out, elements)
+
   return out
+}
+
+/**
+ * Mark layout lines that form dual dialogue so preview/PDF can place columns.
+ * Fountain: the second character cue ends with `^` (parser sets dual: true).
+ */
+function assignDualDialogueColumns(
+  lines: LayoutLine[],
+  elements: FountainElement[]
+): void {
+  let dualGroup = 0
+  let leftStart = -1
+  let leftEnd = -1
+
+  const isDialogueFamily = (t: ElementType): boolean =>
+    t === 'character' ||
+    t === 'parenthetical' ||
+    t === 'dialogue' ||
+    t === 'lyrics'
+
+  /** Extend from a character line through its parentheticals/dialogue (not across spacers). */
+  const blockEndFrom = (charIdx: number): number => {
+    let end = charIdx
+    for (let j = charIdx + 1; j < lines.length; j++) {
+      const L = lines[j]
+      if (L.isSpacer || L.type === 'empty' || L.type === 'page_break') break
+      if (
+        L.type === 'parenthetical' ||
+        L.type === 'dialogue' ||
+        L.type === 'lyrics'
+      ) {
+        end = j
+        continue
+      }
+      break
+    }
+    return end
+  }
+
+  const markRange = (
+    from: number,
+    to: number,
+    col: 'left' | 'right',
+    group: number
+  ): void => {
+    for (let j = from; j <= to; j++) {
+      const L = lines[j]
+      if (L.isSpacer || L.type === 'empty' || L.type === 'page_break') continue
+      if (isDialogueFamily(L.type)) {
+        L.dualColumn = col
+        L.dualGroup = group
+      }
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    if (line.isSpacer || line.type === 'page_break' || line.type === 'empty') {
+      continue
+    }
+
+    const el = elements[line.elementIndex]
+
+    if (line.type === 'character' && el?.dual && leftStart >= 0) {
+      dualGroup += 1
+      markRange(leftStart, leftEnd, 'left', dualGroup)
+      const rightEnd = blockEndFrom(i)
+      markRange(i, rightEnd, 'right', dualGroup)
+      leftStart = -1
+      leftEnd = -1
+      i = rightEnd
+      continue
+    }
+
+    if (line.type === 'character' && !el?.dual) {
+      leftStart = i
+      leftEnd = blockEndFrom(i)
+      continue
+    }
+
+    if (
+      leftStart >= 0 &&
+      !isDialogueFamily(line.type)
+    ) {
+      leftStart = -1
+      leftEnd = -1
+    }
+  }
 }
 
 /**

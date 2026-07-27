@@ -11,6 +11,8 @@
 
 **Repository:** https://github.com/grahaminman/FilmScriptWriter-app
 
+![FilmScriptWriter v1.0.0 Beta](docs/screenshots/FilmScriptWriter-v.1.0.0-Beta.png)
+
 ## Features
 
 | Feature | Description |
@@ -177,6 +179,12 @@ GrokCodeTest/
 ├── package.json
 └── README.md
 ```
+
+## Fountain syntax fidelity
+
+Preview and PDF aim to follow [fountain.io/syntax](https://fountain.io/syntax) (Fountain 1.1): emphasis, dual dialogue, forced `@` names, notes, boneyard, etc. See [docs/FOUNTAIN-FIDELITY.md](./docs/FOUNTAIN-FIDELITY.md) for the full matrix and known limits.
+
+**Find / replace:** patterns like `#*#` use simple wildcards (`*` = any text) so scene numbers `#1#`, `#2#` can be removed in one pass.
 
 ## Starter template
 

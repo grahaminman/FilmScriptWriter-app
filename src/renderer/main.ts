@@ -6,6 +6,7 @@
 import './styles/app.css'
 import { createEditor, type EditorHandle } from './editor/create-editor'
 import { createPreview, applyPageCssVars, type PreviewHandle } from './preview/preview'
+import { createSyntaxSettingsPanel, type SyntaxSettingsHandle } from './ui/syntax-settings'
 import { t } from '../shared/i18n/locales'
 import {
   FONT_SIZE_DEFAULT,
@@ -15,6 +16,13 @@ import {
   type LocaleCode,
   type ThemeMode
 } from '../shared/constants/screenplay'
+import {
+  SYNTAX_PRESET_DEFAULT,
+  applySyntaxPalette,
+  resolvePalette,
+  type SyntaxColorPalette,
+  type SyntaxColorPresetId
+} from '../shared/constants/syntax-colors'
 import { undo, redo } from '@codemirror/commands'
 
 // ---------------------------------------------------------------------------
@@ -31,9 +39,12 @@ let previewVisible = true
 let previewFollow = true
 let typewriterMode = false
 let syntaxHighlighting = true
+let syntaxColorPreset: SyntaxColorPresetId = 'default'
+let syntaxColorsCustom: SyntaxColorPalette = { ...SYNTAX_PRESET_DEFAULT }
 let editorFontSize = FONT_SIZE_DEFAULT
 let suppressDirty = false
 let welcomeDismissed = false
+let syntaxSettings: SyntaxSettingsHandle
 
 let statsTimer: ReturnType<typeof setTimeout> | null = null
 let followTimer: ReturnType<typeof setTimeout> | null = null
@@ -57,6 +68,7 @@ const el = {
   statusFontValue: document.getElementById('status-font-value') as HTMLElement,
   fontSizeLabel: document.getElementById('font-size-label') as HTMLElement,
   btnPreview: document.getElementById('btn-toggle-preview') as HTMLButtonElement,
+  btnSyntaxColors: document.getElementById('btn-syntax-colors') as HTMLButtonElement,
   btnTheme: document.getElementById('btn-theme') as HTMLButtonElement,
   btnFind: document.getElementById('btn-find') as HTMLButtonElement,
   btnReplace: document.getElementById('btn-replace') as HTMLButtonElement,
@@ -125,6 +137,9 @@ function applyLocale(next: LocaleCode): void {
   preview?.setLocale(next)
 
   el.btnPreview.textContent = t(locale, 'menu.view.preview')
+  if (el.btnSyntaxColors) {
+    el.btnSyntaxColors.textContent = t(locale, 'menu.view.syntaxColors').replace('…', '')
+  }
   el.btnTheme.textContent = t(locale, 'menu.theme')
   el.btnFind.textContent = t(locale, 'status.find')
   el.btnReplace.textContent = t(locale, 'status.replace')
@@ -136,9 +151,27 @@ function applyLocale(next: LocaleCode): void {
   el.welcomeNew.textContent = t(locale, 'menu.file.new')
   el.welcomeOpen.textContent = t(locale, 'menu.file.open')
   el.welcomeDismiss.textContent = t(locale, 'common.close')
+  syntaxSettings?.setLocale(locale)
 
   updateTitle()
   updateStatusLabels()
+}
+
+function applySyntaxColors(
+  preset: SyntaxColorPresetId,
+  custom: SyntaxColorPalette,
+  persist = false
+): void {
+  syntaxColorPreset = preset
+  syntaxColorsCustom = { ...SYNTAX_PRESET_DEFAULT, ...custom }
+  const palette = resolvePalette(preset, syntaxColorsCustom)
+  applySyntaxPalette(document.documentElement, palette)
+  if (persist) {
+    void window.api.setPreferences({
+      syntaxColorPreset: preset,
+      syntaxColorsCustom: syntaxColorsCustom
+    })
+  }
 }
 
 function baseName(p: string | null): string {
@@ -401,6 +434,9 @@ function handleMenuAction(action: string): void {
         setSyntax(p.syntaxHighlighting, false)
       })
       break
+    case 'view:syntax-colors':
+      syntaxSettings?.open()
+      break
     case 'view:font-increase':
       bumpFont(FONT_SIZE_STEP)
       break
@@ -454,10 +490,16 @@ async function bootstrap(): Promise<void> {
   previewFollow = prefs.previewFollow
   typewriterMode = prefs.typewriterMode
   syntaxHighlighting = prefs.syntaxHighlighting
+  syntaxColorPreset = (prefs.syntaxColorPreset as SyntaxColorPresetId) || 'default'
+  syntaxColorsCustom = {
+    ...SYNTAX_PRESET_DEFAULT,
+    ...(prefs.syntaxColorsCustom as SyntaxColorPalette)
+  }
   editorFontSize = prefs.editorFontSize ?? FONT_SIZE_DEFAULT
 
   const dark = resolveDark(theme)
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+  applySyntaxColors(syntaxColorPreset, syntaxColorsCustom, false)
 
   editor = createEditor({
     parent: el.editor,
@@ -477,6 +519,17 @@ async function bootstrap(): Promise<void> {
   })
 
   preview = createPreview(el.previewPane, locale)
+  syntaxSettings = createSyntaxSettingsPanel(
+    document.getElementById('app') as HTMLElement,
+    {
+      preset: syntaxColorPreset,
+      custom: syntaxColorsCustom,
+      highlightingEnabled: syntaxHighlighting
+    },
+    (next) => {
+      applySyntaxColors(next.preset, next.custom, true)
+    }
+  )
   applyLocale(locale)
   applyFontSize(editorFontSize, false)
   setPreviewVisible(previewVisible)
@@ -511,6 +564,7 @@ async function bootstrap(): Promise<void> {
 
   // Toolbar / status bar actions
   el.btnPreview.addEventListener('click', () => setPreviewVisible(!previewVisible))
+  el.btnSyntaxColors?.addEventListener('click', () => syntaxSettings?.open())
   el.btnTheme.addEventListener('click', () => {
     const order: ThemeMode[] = ['light', 'dark', 'system']
     const idx = order.indexOf(theme)
@@ -558,6 +612,16 @@ async function bootstrap(): Promise<void> {
     if (p.previewFollow !== previewFollow) setPreviewFollow(p.previewFollow, false)
     if (p.typewriterMode !== typewriterMode) setTypewriter(p.typewriterMode, false)
     if (p.syntaxHighlighting !== syntaxHighlighting) setSyntax(p.syntaxHighlighting, false)
+    if (
+      p.syntaxColorPreset !== syntaxColorPreset ||
+      JSON.stringify(p.syntaxColorsCustom) !== JSON.stringify(syntaxColorsCustom)
+    ) {
+      applySyntaxColors(
+        (p.syntaxColorPreset as SyntaxColorPresetId) || 'default',
+        p.syntaxColorsCustom as SyntaxColorPalette,
+        false
+      )
+    }
     if (p.editorFontSize !== editorFontSize) applyFontSize(p.editorFontSize, false)
   })
 
