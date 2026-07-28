@@ -1,6 +1,6 @@
 {
   "name": "filmscriptwriter",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0",
   "description": "FilmScriptWriter (BETA) — Fountain screenplay editor for desktop. Early preview.",
   "main": "./out/main/index.js",
   "author": {
