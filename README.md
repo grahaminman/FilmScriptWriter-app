@@ -9,7 +9,7 @@
 ![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-**Repository:** https://github.com/grahaminman/FilmScriptWriter-app
+**Repository:** https://github.com/grahaminman/FilmScriptWriter
 
 ![FilmScriptWriter v1.0.0 Beta](docs/screenshots/FilmScriptWriter-v.1.0.0-Beta.png)
 
@@ -51,7 +51,7 @@
 
 ## Downloads (beta)
 
-**GitHub Release v1.0.0.0:** https://github.com/grahaminman/FilmScriptWriter-app/releases/tag/v1.0.0.0
+**GitHub Release v1.0.0.0:** https://github.com/grahaminman/FilmScriptWriter/releases/tag/v1.0.0.0
 
 | Platform | Asset |
 |----------|--------|
@@ -74,8 +74,8 @@ Or push a version tag: `git tag v1.0.0.0 && git push origin v1.0.0.0`
 
 ```bash
 # Clone
-git clone https://github.com/grahaminman/FilmScriptWriter-app.git
-cd FilmScriptWriter-app
+git clone https://github.com/grahaminman/FilmScriptWriter.git
+cd FilmScriptWriter
 
 # Install dependencies
 npm install

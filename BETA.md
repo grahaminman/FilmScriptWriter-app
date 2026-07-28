@@ -17,7 +17,7 @@ It is shared so testers can try Fountain editing, export, and packaging. It is *
 |-----|--------|
 | **`v1.0.0.0`** | First published **beta** GitHub Release (Linux / macOS / Windows installers) — frozen on `main` |
 
-Installers: https://github.com/grahaminman/FilmScriptWriter-app/releases/tag/v1.0.0.0
+Installers: https://github.com/grahaminman/FilmScriptWriter/releases/tag/v1.0.0.0
 
 ## Branches
 
