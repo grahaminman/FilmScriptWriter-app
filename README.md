@@ -9,7 +9,7 @@
 ![Platforms](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-**Repository:** https://github.com/grahaminman/FilmScriptWriter-app
+**Repository:** https://github.com/grahaminman/FilmScriptWriter
 
 ![FilmScriptWriter v1.0.0 Beta](docs/screenshots/FilmScriptWriter-v.1.0.0-Beta.png)
 
@@ -45,15 +45,19 @@
 
 | Branch | Use for |
 |--------|---------|
-| `main` | Beta baseline testers use; CI builds installers from here / tags |
-| `v1.0.1` | Follow-up work after the **v1.0.0.0** beta release |
+| `main` | **v1.0.0.0** beta baseline; tagged installers come from here |
+| **`v1.0.1`** | **Active development** after the v1.0.0.0 beta (package version `1.0.1`) |
 | `next` | Optional sandbox for larger experiments |
 
 ## Downloads (beta)
 
-**GitHub Releases:** https://github.com/grahaminman/FilmScriptWriter-app/releases
+**GitHub Release v1.0.0.0:** https://github.com/grahaminman/FilmScriptWriter/releases/tag/v1.0.0.0
 
-- Tag **`v1.0.0.0`** — first multi-platform beta (Windows / macOS / Linux)
+| Platform | Asset |
+|----------|--------|
+| Windows | `FilmScriptWriter-1.0.0-Setup.exe` |
+| macOS | `FilmScriptWriter-1.0.0-x64.dmg` / `FilmScriptWriter-1.0.0-arm64.dmg` |
+| Linux | `FilmScriptWriter-1.0.0.AppImage` / `FilmScriptWriter-1.0.0.deb` |
 
 ## CI installers (Windows / macOS / Linux)
 
@@ -70,8 +74,8 @@ Or push a version tag: `git tag v1.0.0.0 && git push origin v1.0.0.0`
 
 ```bash
 # Clone
-git clone https://github.com/grahaminman/FilmScriptWriter-app.git
-cd FilmScriptWriter-app
+git clone https://github.com/grahaminman/FilmScriptWriter.git
+cd FilmScriptWriter
 
 # Install dependencies
 npm install

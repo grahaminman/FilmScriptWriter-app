@@ -15,19 +15,19 @@ It is shared so testers can try Fountain editing, export, and packaging. It is *
 
 | Tag | Status |
 |-----|--------|
-| **`v1.0.0.0`** | First published **beta** GitHub Release (Linux / macOS / Windows installers) |
+| **`v1.0.0.0`** | First published **beta** GitHub Release (Linux / macOS / Windows installers) — frozen on `main` |
 
-Installers ship as a **pre-release** on GitHub: https://github.com/grahaminman/FilmScriptWriter-app/releases
+Installers: https://github.com/grahaminman/FilmScriptWriter/releases/tag/v1.0.0.0
 
 ## Branches
 
 | Branch | Purpose |
 |--------|---------|
-| `main` | Current **beta** line — what CI builds and what testers should use (`v1.0.0.0` baseline) |
-| `v1.0.1` | Follow-up development after the v1.0.0.0 beta release |
+| `main` | **v1.0.0.0 beta baseline** — what testers should install from Releases |
+| **`v1.0.1`** | **Active development** after v1.0.0.0 (package version `1.0.1`) |
 | `next` | Optional sandbox for larger experiments |
 
-When the beta is good enough, keep shipping fixes on `main` (or promote a stable tag). Use `v1.0.1` / `next` for work that should not confuse beta testers.
+Use the **`v1.0.1`** branch for post-beta fixes and features. Merge back to `main` when ready for the next tagged release.
 
 ## Reporting issues
 
