@@ -45,15 +45,19 @@
 
 | Branch | Use for |
 |--------|---------|
-| `main` | Beta baseline testers use; CI builds installers from here / tags |
-| `v1.0.1` | Follow-up work after the **v1.0.0.0** beta release |
+| `main` | **v1.0.0.0** beta baseline; tagged installers come from here |
+| **`v1.0.1`** | **Active development** (this branch) — package version `1.0.1` |
 | `next` | Optional sandbox for larger experiments |
 
 ## Downloads (beta)
 
-**GitHub Releases:** https://github.com/grahaminman/FilmScriptWriter-app/releases
+**GitHub Release v1.0.0.0:** https://github.com/grahaminman/FilmScriptWriter-app/releases/tag/v1.0.0.0
 
-- Tag **`v1.0.0.0`** — first multi-platform beta (Windows / macOS / Linux)
+| Platform | Asset |
+|----------|--------|
+| Windows | `FilmScriptWriter-1.0.0-Setup.exe` |
+| macOS | `FilmScriptWriter-1.0.0-x64.dmg` / `FilmScriptWriter-1.0.0-arm64.dmg` |
+| Linux | `FilmScriptWriter-1.0.0.AppImage` / `FilmScriptWriter-1.0.0.deb` |
 
 ## CI installers (Windows / macOS / Linux)
 
