@@ -11,14 +11,23 @@ It is shared so testers can try Fountain editing, export, and packaging. It is *
 - Installers may be **unsigned** (Windows SmartScreen / macOS Gatekeeper may warn)
 - Do not rely on it for critical production deadlines without your own backups
 
+## Releases
+
+| Tag | Status |
+|-----|--------|
+| **`v1.0.0.0`** | First published **beta** GitHub Release (Linux / macOS / Windows installers) |
+
+Installers ship as a **pre-release** on GitHub: https://github.com/grahaminman/FilmScriptWriter-app/releases
+
 ## Branches
 
 | Branch | Purpose |
 |--------|---------|
-| `main` | Current **beta** line — what CI builds and what testers should use |
-| `next` | Follow-up work after you are happy with the beta baseline (created for ongoing development) |
+| `main` | Current **beta** line — what CI builds and what testers should use (`v1.0.0.0` baseline) |
+| `v1.0.1` | Follow-up development after the v1.0.0.0 beta release |
+| `next` | Optional sandbox for larger experiments |
 
-When the beta is good enough, keep shipping fixes on `main` (or promote a stable tag). Use `next` for larger experiments that should not confuse beta testers.
+When the beta is good enough, keep shipping fixes on `main` (or promote a stable tag). Use `v1.0.1` / `next` for work that should not confuse beta testers.
 
 ## Reporting issues
 

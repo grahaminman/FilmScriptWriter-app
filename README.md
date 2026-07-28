@@ -46,7 +46,14 @@
 | Branch | Use for |
 |--------|---------|
 | `main` | Beta baseline testers use; CI builds installers from here / tags |
-| `next` | Follow-up development after you are happy with the beta |
+| `v1.0.1` | Follow-up work after the **v1.0.0.0** beta release |
+| `next` | Optional sandbox for larger experiments |
+
+## Downloads (beta)
+
+**GitHub Releases:** https://github.com/grahaminman/FilmScriptWriter-app/releases
+
+- Tag **`v1.0.0.0`** — first multi-platform beta (Windows / macOS / Linux)
 
 ## CI installers (Windows / macOS / Linux)
 
@@ -54,9 +61,10 @@ You do not need your own Mac or Windows machine to **produce** installers.
 
 1. Push to GitHub (this repo)
 2. Open **Actions** → **Build installers (beta)** → **Run workflow**
-3. Download artifacts for Ubuntu (AppImage/deb), Windows (exe), and macOS (dmg)
+3. Optionally enable **create_release** and set tag (e.g. `v1.0.0.0`) to publish a pre-release
+4. Download artifacts from the run, or from the GitHub Release page
 
-Or push a version tag: `git tag v1.0.0-beta.1 && git push origin v1.0.0-beta.1`
+Or push a version tag: `git tag v1.0.0.0 && git push origin v1.0.0.0`
 
 ## Quick start
 

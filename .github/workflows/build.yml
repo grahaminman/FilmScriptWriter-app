@@ -2,17 +2,29 @@
 # Triggered on tags (releases) and manual "Run workflow".
 #
 # BETA: installers are for testing only — not a stable product release.
-# Artifacts are uploaded to the Actions run (not auto-published as a GitHub Release).
+# When create_release is true (or a v* tag is pushed), also publish a GitHub pre-release.
 
 name: Build installers (beta)
 
 on:
   workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a GitHub pre-release with the built installers'
+        type: boolean
+        default: false
+      tag:
+        description: 'Release tag (e.g. v1.0.0.0). Used only when create_release is true.'
+        type: string
+        default: 'v1.0.0.0'
   push:
     tags:
       - 'v*'
   pull_request:
     branches: [main]
+
+permissions:
+  contents: write
 
 jobs:
   test:
@@ -69,3 +81,58 @@ jobs:
             release/*.yml
           if-no-files-found: warn
           retention-days: 14
+
+  release:
+    name: Publish GitHub pre-release
+    needs: build
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.create_release == true)
+    steps:
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: FilmScriptWriter-beta-*
+          merge-multiple: true
+
+      - name: List release assets
+        run: find dist -type f | sort
+
+      - name: Create GitHub pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+          name: FilmScriptWriter ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }} (Beta)
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          generate_release_notes: true
+          body: |
+            ## FilmScriptWriter beta
+
+            Early preview installers for **Linux**, **macOS**, and **Windows**.
+
+            > **Not production-ready.** Features may change; installers are unsigned.
+
+            ### Downloads
+
+            | Platform | Installer |
+            |----------|-----------|
+            | **Windows** | `FilmScriptWriter-*-Setup.exe` (NSIS) |
+            | **macOS** | `FilmScriptWriter-*-*.dmg` (x64 + arm64 when available) |
+            | **Linux** | `FilmScriptWriter-*.AppImage` and `.deb` |
+
+            ### Notes
+
+            - Windows SmartScreen / macOS Gatekeeper may warn on unsigned builds — that is expected for beta.
+            - Source: commit `${{ github.sha }}`
+            - See [BETA.md](https://github.com/grahaminman/FilmScriptWriter-app/blob/main/BETA.md) for testing guidance.
+          files: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.exe
+            dist/*.dmg
+            dist/*.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
