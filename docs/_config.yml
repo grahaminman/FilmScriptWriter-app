@@ -1,0 +1,21 @@
+title: FilmScriptWriter
+email: graham.inman@outlook.com
+description: >-
+  FilmScriptWriter is a tool for writing and formatting screenplays in Fountain markup.
+baseurl: ""
+url: "https://filmscriptwriter.com"
+twitter_username: grahaminman
+github_username:  grahaminman
+
+# Build settings
+theme: minima
+plugins:
+  - jekyll-feed
+
+# GitHub Pages settings
+github:
+  is_project_page: false
+  repository_name: FilmScriptWriter
+include:
+  - .htaccess
+  - CNAME
