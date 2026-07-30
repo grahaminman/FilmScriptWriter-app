@@ -1,7 +1,3 @@
----
-layout: home
-title: FilmScriptWriter
----
 
 # FilmScriptWriter
 
